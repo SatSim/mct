@@ -4,12 +4,11 @@ require 'etc'
 
 filelist = `ls tlm`
 filearray = filelist.split("\n")
-outfile = open("msgids_tlm.txt", "w")
+outfile = open("msgids.txt", "w")
 for file in filearray
   file = file.split(".tlm")[0]
   outfile.write(file + " 0x08\n")
 end
-outfile.close
 
 #filelist = `ls cmd`
 #filearray = filelist.split("\n")
@@ -19,7 +18,6 @@ cfepath = "/home/" + user +"/cfs/cfe/docs/cFEUsersGuide/Doxygen/"
 appspath = "/home/" + user + "/cfs/apps/"
 cfeapps = ["es", "evs", "sb", "time", "tbl"]
 apps = ["cf", "cs", "ds", "fm", "hk", "hs", "lc", "md", "mm", "sc", "sch"]
-outfile = open("msgids_cmd.txt", "w")
 
 for cfeapp in cfeapps
   infile = Nokogiri::HTML(open(cfepath + "cfe__" + cfeapp + "__msg_8h-source.html"))
@@ -28,7 +26,19 @@ for cfeapp in cfeapps
     if command.text.include?("_CC")
       cmdname = command.text.split(" ")[1].split("_CC").first
       cmdcode = command.text.split(" ").last
-      outfile.write(cmdname + " " + cmdcode + " 0x18\n")
+      case cfeapp
+        when "es"
+          suffix = "06"
+        when "evs"
+          suffix = "01"
+        when "sb"
+          suffix = "03"
+        when "time"
+          suffix = "05"
+        when "tbl"
+          suffix = "04"
+      end
+      outfile.write(cmdname + " " + cmdcode + " 0x18" + suffix + "\n")
     end
   end
 end
@@ -44,7 +54,31 @@ for app in apps
     if command.text.include?("_CC")
       cmdname = command.text.split(" ")[1].split("_CC").first
       cmdcode = command.text.split(" ").last
-      outfile.write(cmdname + " " + cmdcode + " 0x18\n")
+      case app
+        when "cf"
+          suffix = "B3"
+        when "cs"
+          suffix = "9F"
+        when "ds"
+          suffix = "BB"
+        when "fm"
+          suffix = "8C"
+        when "hk"
+          suffix = "9A"
+        when "hs"
+          suffix = "AE"
+        when "lc"
+          suffix = "A4"
+        when "md"
+          suffix = "90"
+        when "mm"
+          suffix = "88"
+        when "sc"
+          suffix = "A9"
+        when "sch"
+          suffix = "95"
+      end
+      outfile.write(cmdname + " " + cmdcode + " 0x18" + suffix + "\n")
     end
   end
 end

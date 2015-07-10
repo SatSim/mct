@@ -5,6 +5,8 @@
 #
 # Before use, remove the space in the "${CFS_ROOT}/cfe/doc/cFE UsersGuide"
 # directory. ${CFS_ROOT} is assumed to be /home/${USERNAME}/cfs.
+# Also, it is assumed that you are using all the open-source apps except SBN.
+# If you're not, you will need to edit the "apps" list near the bottom.
 # Your COSMOS project is assumed to be at /home/${USERNAME}/COSMOS/cfs,
 # and your target is assumed to be named CFS.
 # You will need a message ID database called msgids.txt in the directory
@@ -15,7 +17,7 @@
 # Current issues:
 # Can't build commands for CF app (dox is different)
 # Need to document or otherwise parse CI and TO lab apps
-# Need to finish implementing message IDs for commands (it works for tlm)
+# Need to implement checksums and packet data length for commands
 # Would like to implement limits and formatting - maybe do this in screens, not here
 #
 # Author: Bryan Anderson
@@ -28,13 +30,13 @@
 require 'rubygems' #So that gems are a thing
 require 'nokogiri' #HTML parser
 require 'dentaku' #Formula parser
-require 'etc' #To get user's username
+require 'etc' #To get username
 
 
 
 
 #This method writes the CCSDS header info to the file.
-def ccsds(output, cmdtlm, parentname, msgid)
+def ccsds(output, cmdtlm, parentname, msgid, cmdid)
   if cmdtlm == 0 #If this is telemetry
     thing = "ITEM"
     if parentname != nil #If this is a sub-packet
@@ -55,9 +57,8 @@ def ccsds(output, cmdtlm, parentname, msgid)
     ccsds1 = "  APPEND_ID_" + thing + " CCSDS_STREAMID 16 UINT MIN_UINT16 MAX_UINT16 " + msgid + " \"CCSDS Packet Identification\""
     ccsds2 = "  APPEND_" + thing + " CCSDS_SEQUENCE 16 UINT MIN_UINT16 MAX_UINT16 0xC000 \"CCSDS Packet Sequence Control\""
     ccsds3 = "  APPEND_" + thing + " CCSDS_LENGTH 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Data Length\""
-    ccsds4 = "  APPEND_" + thing + " CCSDS_FC 8 UINT MIN_UINT8 MAX_UINT8 0 \"CCSDS Command Function Code\""
+    ccsds4 = "  APPEND_" + thing + " CCSDS_FC 8 UINT MIN_UINT8 MAX_UINT8 " + cmdid + " \"CCSDS Command Function Code\""
     ccsds5 = "  APPEND_" + thing + " CCSDS_CHECKSUM 8 UINT MIN_UINT8 MAX_UINT8 0 \"CCSDS Command Checksum\""
-    end
   end
 
   output.write(ccsds1)
@@ -252,7 +253,7 @@ def declareitem(item, cmdtlm, parentname, parentinfo, outfile, path, cfepath)
     end
     for childitem in tdefpage.css('td.memItemRight a') #For each sub-item
       if (childitem.text.include? "TlmHeader") || (childitem.text.include? "Hdr") #If it's a header
-        ccsds(outfile, 0, itemname, "SUBITEM") 
+        ccsds(outfile, 0, itemname, "SUBITEM", 0) 
       elsif (!childitem.text.include? "_") #If it's not
         declareitem(childitem, cmdtlm, itemname, iteminfo, outfile, path, cfepath)
       end
@@ -303,7 +304,7 @@ def mktlm(apphome, path, cfepath, msgids)
 
       for item in page.css('td.memItemRight a') #For each item in the packet
         if (item.text.include? "TlmHeader") || (item.text.include? "Hdr") #If it's a header
-          ccsds(output, 0, nil, msgid)
+          ccsds(output, 0, nil, msgid, 0)
         elsif (!item.text.include? "_") #Otherwise, unless it's a linked size vairable
           declareitem(item, 0, nil, nil, output, path, cfepath)
         end
@@ -333,8 +334,10 @@ def mkcmds(apphome, path, cfepath, msgids)
       msgidindex =  msgids.index{|s| s.include?(cmdname)}
       if msgidindex != nil #If there is one, that is
         msgid = msgids[msgidindex].split(" ").last
+	cmdid = msgids[msgidindex].split(" ")[1]
       else #Or if there's not, don't
         msgid = "CMD_NO_MSGID"
+	msgid = "CMD_NO_CMDID"
       end
 
       if cmdname == "FM_DELETE_INT" #If it's that one weird command
@@ -348,9 +351,9 @@ def mkcmds(apphome, path, cfepath, msgids)
       output.write("\n")
 
       if cmdname != "FM_DELETE_INT" && cmddetails.css("dl")[3].css("a")[0].text == "CFE_SB_CmdHdr_t" #That one weird command again
-        ccsds(output, 1, nil, msgid)
+        ccsds(output, 1, nil, msgid, cmdid)
       elsif cmdname == "SC_MANAGE_TABLE" #That other weird command
-        ccsds(output, 1, nil, msgid)
+        ccsds(output, 1, nil, msgid, cmdid)
         output.write("  APPEND_PARAMETER PARAMETER 32 UINT MIN_UINT32 MAX_UINT32 0 \"Application specified command parameter. \"")
         output.write("\n")
       else #Normal commands
@@ -358,7 +361,7 @@ def mkcmds(apphome, path, cfepath, msgids)
   
         for item in cmdpage.css('td.memItemRight a') #For each parameter in a command packet
           if (item.text == "CmdHeader") || (item.text == "Hdr") || (item.text == "Pri") || (item.text == "Sec") || (item.text == "Header") #If it's a header
-            ccsds(output, 1, nil, msgid)
+            ccsds(output, 1, nil, msgid, cmdid)
           elsif (!item.text.include? "_") #If it's not a header
             declareitem(item, 1, nil, nil, output, path, cfepath)
           end
