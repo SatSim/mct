@@ -1,0 +1,12 @@
+TELEMETRY CFS FM_FILEINFOPKT BIG_ENDIAN "Get File Info telemetry packet"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x088B "CCSDS Packet Identification"
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
+  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ITEM FILESTATUS 8 UINT "Status indicating whether the file is open or closed."
+  APPEND_ARRAY_ITEM SPARE 8 UINT 16 "Structure padding."
+  APPEND_ITEM CRC 32 UINT "CRC value if computed."
+  APPEND_ITEM FILESIZE 32 UINT "File Size."
+  APPEND_ITEM LASTMODIFIEDTIME 32 UINT "Last Modification Time of File."
+  APPEND_ARRAY_ITEM FILENAME 8 UINT 512 "Name of File."
+

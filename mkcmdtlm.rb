@@ -9,13 +9,14 @@
 # and your target is assumed to be named CFS.
 # You will need a message ID database called msgids.txt in the directory
 # where you run this script. It should come with the script.
-# Then, simply run "ruby mkcmdtlm.rb" from anywhere you like, and the
+# Then, simply run "ruby mkcmdtlm.rb" from wherever this script is, and the
 # command and telemetry databases will be generated in your COSMOS target.
 #
 # Current issues:
 # Can't build commands for CF app (dox is different)
-# Need to document or otherwise parse CI and TO
+# Need to document or otherwise parse CI and TO lab apps
 # Need to finish implementing message IDs for commands (it works for tlm)
+# Would like to implement limits and formatting - maybe do this in screens, not here
 #
 # Author: Bryan Anderson
 # NASA Goddard SFC / Embedded Flight Systems, Inc.
@@ -36,13 +37,13 @@ require 'etc' #To get user's username
 def ccsds(output, cmdtlm, parentname, msgid)
   if cmdtlm == 0 #If this is telemetry
     thing = "ITEM"
-    if parentname != nil #If this is an independent packet
+    if parentname != nil #If this is a sub-packet
       ccsds1 = "  APPEND_" + thing + " " + parentname + "_CCSDS_STREAMID 16 UINT \"CCSDS Packet Identification\""
       ccsds2 = "  APPEND_" + thing + " " + parentname + "_CCSDS_SEQUENCE 16 UINT \"CCSDS Packet Sequence Control\""
       ccsds3 = "  APPEND_" + thing + " " + parentname + "_CCSDS_LENGTH 16 UINT \"CCSDS Packet Data Length\""
       ccsds4 = "  APPEND_" + thing + " " + parentname + "_CCSDS_TIME 48 UINT \"CCSDS Telemetry Secondary Header\""
       ccsds5 = nil;
-    else #If this is a sub-packet
+    else #If this is an independent packet
       ccsds1 = "  APPEND_ID_" + thing + " CCSDS_STREAMID 16 UINT " + msgid + " \"CCSDS Packet Identification\""
       ccsds2 = "  APPEND_" + thing + " CCSDS_SEQUENCE 16 UINT \"CCSDS Packet Sequence Control\""
       ccsds3 = "  APPEND_" + thing + " CCSDS_LENGTH 16 UINT \"CCSDS Packet Data Length\""
@@ -51,18 +52,11 @@ def ccsds(output, cmdtlm, parentname, msgid)
     end
   else #If this is a command
     thing = "PARAMETER"
-    if parentname != nil #If this is an independent packet
-      ccsds1 = "  APPEND_" + thing + " " + parentname + "_CCSDS_STREAMID 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Identification\""
-      ccsds2 = "  APPEND_" + thing + " " + parentname + "_CCSDS_SEQUENCE 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Sequence Control\""
-      ccsds3 = "  APPEND_" + thing + " " + parentname + "_CCSDS_LENGTH 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Data Length\""
-      ccsds4 = "  APPEND_" + thing + " " + parentname + "_CCSDS_FC 8 UINT MIN_UINT8 MAX_UINT8 0\"CCSDS Command Function Code\""
-      ccsds5 = "  APPEND_" + thing + " " + parentname + "_CCSDS_CHECKSUM 8 UINT MIN_UINT8 MAX_UINT8 0\"CCSDS Command Checksum\""
-    else #If this is a sub-packet
-      ccsds1 = "  APPEND_" + thing + " CCSDS_STREAMID 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Identification\""
-      ccsds2 = "  APPEND_" + thing + " CCSDS_SEQUENCE 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Sequence Control\""
-      ccsds3 = "  APPEND_" + thing + " CCSDS_LENGTH 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Data Length\""
-      ccsds4 = "  APPEND_" + thing + " CCSDS_FC 8 UINT MIN_UINT8 MAX_UINT8 0 \"CCSDS Command Function Code\""
-      ccsds5 = "  APPEND_" + thing + " CCSDS_CHECKSUM 8 UINT MIN_UINT8 MAX_UINT8 0 \"CCSDS Command Checksum\""
+    ccsds1 = "  APPEND_ID_" + thing + " CCSDS_STREAMID 16 UINT MIN_UINT16 MAX_UINT16 " + msgid + " \"CCSDS Packet Identification\""
+    ccsds2 = "  APPEND_" + thing + " CCSDS_SEQUENCE 16 UINT MIN_UINT16 MAX_UINT16 0xC000 \"CCSDS Packet Sequence Control\""
+    ccsds3 = "  APPEND_" + thing + " CCSDS_LENGTH 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Data Length\""
+    ccsds4 = "  APPEND_" + thing + " CCSDS_FC 8 UINT MIN_UINT8 MAX_UINT8 0 \"CCSDS Command Function Code\""
+    ccsds5 = "  APPEND_" + thing + " CCSDS_CHECKSUM 8 UINT MIN_UINT8 MAX_UINT8 0 \"CCSDS Command Checksum\""
     end
   end
 
@@ -190,7 +184,7 @@ def declareitem(item, cmdtlm, parentname, parentinfo, outfile, path, cfepath)
     arraysize = item.parent.text.split(" ", 2)[1].split("[")[1].split("]")[0] #The (most likely variable) size of the array
     elemsize = itemtype.split(" ")[0] #The size of each element of the array
 
-    if elemsize == "TYPEDEF"
+    if elemsize == "TYPEDEF" #If it's an array of defined types, find out the size per element
       typelink = item.parent.parent.css('td.memItemLeft a')
       typeurl = typelink.first['href']
       if typeurl.include? "../cfe/"
@@ -296,7 +290,7 @@ def mktlm(apphome, path, cfepath, msgids)
       if msgidindex != nil #If the message has an ID
         msgid = msgids[msgidindex].split(" ").last
       else #Or not
-        msgid = "TLM_ERROR"
+        msgid = "TLM_NO_MSGID"
       end
 
       output = open("tlm/" + pktname + ".tlm", 'w')
@@ -340,7 +334,7 @@ def mkcmds(apphome, path, cfepath, msgids)
       if msgidindex != nil #If there is one, that is
         msgid = msgids[msgidindex].split(" ").last
       else #Or if there's not, don't
-        msgid = "CMD_ERROR"
+        msgid = "CMD_NO_MSGID"
       end
 
       if cmdname == "FM_DELETE_INT" #If it's that one weird command

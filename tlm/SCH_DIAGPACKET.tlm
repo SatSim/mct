@@ -1,0 +1,8 @@
+TELEMETRY CFS SCH_DIAGPACKET BIG_ENDIAN "Scheduler Diagnostic Telemetry format"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0898 "CCSDS Packet Identification"
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
+  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ARRAY_ITEM ENTRYSTATES 16 UINT 1024 "States of each Schedule Entry."
+  APPEND_ARRAY_ITEM MSGIDS 16 UINT 8000 "Message ID of msg associated with each entry."
+

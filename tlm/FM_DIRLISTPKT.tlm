@@ -1,0 +1,11 @@
+TELEMETRY CFS FM_DIRLISTPKT BIG_ENDIAN "Get Directory Listing telemetry packet"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x088C "CCSDS Packet Identification"
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
+  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ARRAY_ITEM DIRNAME 8 UINT 512 "Directory Name."
+  APPEND_ITEM TOTALFILES 32 UINT "Number of files in the directory."
+  APPEND_ITEM PACKETFILES 32 UINT "Number of files in this packet."
+  APPEND_ITEM FIRSTFILE 32 UINT "Index into directory files of first packet file."
+  APPEND_ARRAY_ITEM FILELIST 72 UINT 1440 "Directory listing file data."
+

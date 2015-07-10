@@ -1,0 +1,11 @@
+TELEMETRY CFS MD_DWELLPKT BIG_ENDIAN "Memory Dwell Telemetry Packet format"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0891 "CCSDS Packet Identification"
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
+  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ITEM TABLEID 8 UINT "TableId from 1 to MD_NUM_DWELL_TABLES."
+  APPEND_ITEM ADDRCOUNT 8 UINT "Number of addresses being sent - 1..MD_DWELL_TABLE_SIZE valid."
+  APPEND_ITEM BYTECOUNT 16 UINT "Number of bytes of dwell data contained in packet."
+  APPEND_ITEM RATE 32 UINT "Number of counts between packet sends."
+  APPEND_ARRAY_ITEM DATA 8 UINT 800 "Dwell data ( number of bytes varies up to MD_DWELL_TABLE_SIZE *4)."
+

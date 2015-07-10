@@ -1,0 +1,8 @@
+TELEMETRY CFS FM_OPENFILESPKT BIG_ENDIAN "Get Open Files telemetry packet"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x088D "CCSDS Packet Identification"
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
+  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ITEM NUMOPENFILES 32 UINT "Number of files opened via cFE."
+  APPEND_ARRAY_ITEM OPENFILESLIST 16 UINT 800 "List of files opened via cFE."
+
