@@ -1,8 +1,9 @@
 TELEMETRY CFS MD_HKTLM BIG_ENDIAN "Memory Dwell HK Telemetry format"
-  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0890 "CCSDS Packet Identification"
-  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
-  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
-  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0890 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SECONDS 32 UINT "CCSDS Telemetry Secondary Header (seconds)"
+  APPEND_ITEM CCSDS_SUBSECS 16 UINT "CCSDS Telemetry Secondary Header (subseconds)"
   APPEND_ITEM INVALIDCMDCNTR 8 UINT "Count of invalid commands received."
   APPEND_ITEM VALIDCMDCNTR 8 UINT "Count of valid commands received."
   APPEND_ITEM DWELLENABLEDMASK 16 UINT "Each bit in bit mask enables a table 0x0001=TBL1 enable bit,0x0002=TBL2 enable bit, 0x0004=TBL3 enable bit,0x0008=TBL4 enable bit, etc."

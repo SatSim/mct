@@ -1,8 +1,9 @@
 TELEMETRY CFS SC_HKTLM BIG_ENDIAN "Housekeeping Packet Structure"
-  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x08AA "CCSDS Packet Identification"
-  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
-  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
-  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x08AA "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SECONDS 32 UINT "CCSDS Telemetry Secondary Header (seconds)"
+  APPEND_ITEM CCSDS_SUBSECS 16 UINT "CCSDS Telemetry Secondary Header (subseconds)"
   APPEND_ITEM ATSNUMBER 8 UINT "current ATS number 1 = ATS A, 2 = ATS B"
   APPEND_ITEM ATPSTATE 8 UINT "current ATP state valid values are: 2 = IDLE, 5 = EXECUTING"
   APPEND_ITEM CONTINUEATSONFAILUREFLAG 8 UINT "In the event of ATS execution failure (ats command fails checksum) , the ATS execution will continue if this flag is set to TRUE and will stop if this flag is set to FALSE."

@@ -1,23 +1,23 @@
 #
-# Mkcmdtlm is a utility for making COSMOS command and telemetry
-# definition files for Core Flight System by parsing the CFS Doxygen
-# documentation.
+# MCT (Make Commands and Telemetry) is a utility for making COSMOS command 
+# and telemetry definition files for Core Flight System by parsing the CFS 
+# Doxygen documentation.
 #
 # Before use, remove the space in the "${CFS_ROOT}/cfe/doc/cFE UsersGuide"
 # directory. ${CFS_ROOT} is assumed to be /home/${USERNAME}/cfs.
 # Also, it is assumed that you are using all the open-source apps except SBN.
-# If you're not, you will need to edit the "apps" list near the bottom.
+# Otherwise, you will need to edit the "apps" list near the bottom.
 # Your COSMOS project is assumed to be at /home/${USERNAME}/COSMOS/cfs,
 # and your target is assumed to be named CFS.
-# You will need a message ID database called msgids.txt in the directory
+# You will need a telemetry ID database called tlmids.txt in the directory
 # where you run this script. It should come with the script.
-# Then, simply run "ruby mkcmdtlm.rb" from wherever this script is, and the
+# Then, simply run "ruby mct" from wherever this script is, and the
 # command and telemetry databases will be generated in your COSMOS target.
 #
 # Current issues:
 # Can't build commands for CF app (dox is different)
 # Need to document or otherwise parse CI and TO lab apps
-# Need to implement checksums and packet data length for commands
+# Need to implement packet data length for commands
 # Would like to implement limits and formatting - maybe do this in screens, not here
 #
 # Author: Bryan Anderson
@@ -40,25 +40,25 @@ def ccsds(output, cmdtlm, parentname, msgid, cmdid)
   if cmdtlm == 0 #If this is telemetry
     thing = "ITEM"
     if parentname != nil #If this is a sub-packet
-      ccsds1 = "  APPEND_" + thing + " " + parentname + "_CCSDS_STREAMID 16 UINT \"CCSDS Packet Identification\""
-      ccsds2 = "  APPEND_" + thing + " " + parentname + "_CCSDS_SEQUENCE 16 UINT \"CCSDS Packet Sequence Control\""
-      ccsds3 = "  APPEND_" + thing + " " + parentname + "_CCSDS_LENGTH 16 UINT \"CCSDS Packet Data Length\""
-      ccsds4 = "  APPEND_" + thing + " " + parentname + "_CCSDS_TIME 48 UINT \"CCSDS Telemetry Secondary Header\""
-      ccsds5 = nil;
+      ccsds1 = "  APPEND_" + thing + " " + parentname + "_CCSDS_STREAMID 16 UINT \"CCSDS Packet Identification\" BIG_ENDIAN"
+      ccsds2 = "  APPEND_" + thing + " " + parentname + "_CCSDS_SEQUENCE 16 UINT \"CCSDS Packet Sequence Control\" BIG_ENDIAN"
+      ccsds3 = "  APPEND_" + thing + " " + parentname + "_CCSDS_LENGTH 16 UINT \"CCSDS Packet Data Length\" BIG_ENDIAN"
+      ccsds4 = "  APPEND_" + thing + " " + parentname + "_CCSDS_SECONDS 32 UINT \"CCSDS Telemetry Secondary Header (seconds)\""
+      ccsds5 = "  APPEND_" + thing + " " + parentname + "_CCSDS_SUBSECS 16 UINT \"CCSDS Telemetry Secondary Header (subseconds)\""
     else #If this is an independent packet
-      ccsds1 = "  APPEND_ID_" + thing + " CCSDS_STREAMID 16 UINT " + msgid + " \"CCSDS Packet Identification\""
-      ccsds2 = "  APPEND_" + thing + " CCSDS_SEQUENCE 16 UINT \"CCSDS Packet Sequence Control\""
-      ccsds3 = "  APPEND_" + thing + " CCSDS_LENGTH 16 UINT \"CCSDS Packet Data Length\""
-      ccsds4 = "  APPEND_" + thing + " CCSDS_TIME 48 UINT \"CCSDS Telemetry Secondary Header\""
-      ccsds5 = nil;
+      ccsds1 = "  APPEND_ID_" + thing + " CCSDS_STREAMID 16 UINT " + msgid + " \"CCSDS Packet Identification\" BIG_ENDIAN"
+      ccsds2 = "  APPEND_" + thing + " CCSDS_SEQUENCE 16 UINT \"CCSDS Packet Sequence Control\" BIG_ENDIAN"
+      ccsds3 = "  APPEND_" + thing + " CCSDS_LENGTH 16 UINT \"CCSDS Packet Data Length\" BIG_ENDIAN"
+      ccsds4 = "  APPEND_" + thing + " CCSDS_SECONDS 32 UINT \"CCSDS Telemetry Secondary Header (seconds)\""
+      ccsds5 = "  APPEND_" + thing + " CCSDS_SUBSECS 16 UINT \"CCSDS Telemetry Secondary Header (subseconds)\""
     end
   else #If this is a command
     thing = "PARAMETER"
-    ccsds1 = "  APPEND_ID_" + thing + " CCSDS_STREAMID 16 UINT MIN_UINT16 MAX_UINT16 " + msgid + " \"CCSDS Packet Identification\""
-    ccsds2 = "  APPEND_" + thing + " CCSDS_SEQUENCE 16 UINT MIN_UINT16 MAX_UINT16 0xC000 \"CCSDS Packet Sequence Control\""
-    ccsds3 = "  APPEND_" + thing + " CCSDS_LENGTH 16 UINT MIN_UINT16 MAX_UINT16 0 \"CCSDS Packet Data Length\""
-    ccsds4 = "  APPEND_" + thing + " CCSDS_FC 8 UINT MIN_UINT8 MAX_UINT8 " + cmdid + " \"CCSDS Command Function Code\""
-    ccsds5 = "  APPEND_" + thing + " CCSDS_CHECKSUM 8 UINT MIN_UINT8 MAX_UINT8 0 \"CCSDS Command Checksum\""
+    ccsds1 = "  APPEND_ID_" + thing + " CCSDS_STREAMID 16 UINT MIN_UINT16 MAX_UINT16 " + msgid + " \"CCSDS Packet Identification\" BIG_ENDIAN"
+    ccsds2 = "  APPEND_" + thing + " CCSDS_SEQUENCE 16 UINT MIN_UINT16 MAX_UINT16 0xC000 \"CCSDS Packet Sequence Control\" BIG_ENDIAN"
+    ccsds3 = "  APPEND_" + thing + " CCSDS_LENGTH 16 UINT MIN_UINT16 MAX_UINT16 1 \"CCSDS Packet Data Length\" BIG_ENDIAN"
+    ccsds4 = "  APPEND_" + thing + " CCSDS_CHECKSUM 8 UINT MIN_UINT8 MAX_UINT8 0 \"CCSDS Command Checksum\""
+    ccsds5 = "  APPEND_" + thing + " CCSDS_FC 8 UINT MIN_UINT8 MAX_UINT8 " + cmdid + " \"CCSDS Command Function Code\""
   end
 
   output.write(ccsds1)
@@ -84,8 +84,13 @@ end
 
 #This method gets the type of a telemetry item, and the corresponding max and min values
 def getitemtype(itemtypestr)
-  if itemtypestr == "uint8" || itemtypestr == "boolean" || itemtypestr == "char" || itemtypestr == "CFE_SB_PipeId_t"
+  if itemtypestr == "uint8" || itemtypestr == "boolean" || itemtypestr == "CFE_SB_PipeId_t"
     itemtype = "8 UINT"
+    itemmin = "MIN_UINT8"
+    itemmax = "MAX_UINT8"
+    itemdef = 0
+  elsif itemtypestr == "char"
+    itemtype = "STRING"
     itemmin = "MIN_UINT8"
     itemmax = "MAX_UINT8"
     itemdef = 0
@@ -177,14 +182,24 @@ def declareitem(item, cmdtlm, parentname, parentinfo, outfile, path, cfepath)
   itemtype, itemmin, itemmax, itemdef = getitemtype(item.parent.parent.css('td.memItemLeft').text.gsub(/\u00a0/, ' ').strip)
 
   arraychk = item.parent.text
-  if arraychk.include? "[" #If the item is an array
+  if arraychk.include? "[" #If the item is an array (or a string)
     if parentname != nil #If the array is in a sub-packet
       itemname = parentname + "_" + itemname
       iteminfo = iteminfo + " (Parent: " + parentinfo + ")"
     end
     arraysize = item.parent.text.split(" ", 2)[1].split("[")[1].split("]")[0] #The (most likely variable) size of the array
-    elemsize = itemtype.split(" ")[0] #The size of each element of the array
 
+    if (arraychk.include? "OS_MAX_API_NAME") || (arraychk.include? "OS_MAX_PATH_LEN") #These are actually strings
+      itemtype = "STRING"
+    end
+    
+    if itemtype == "STRING" #If it's a string...
+      elemsize = 8
+    else  #...or if it's actually an array
+      elemsize = itemtype.split(" ")[0] #The size of each element of the array
+    end
+
+      
     if elemsize == "TYPEDEF" #If it's an array of defined types, find out the size per element
       typelink = item.parent.parent.css('td.memItemLeft a')
       typeurl = typelink.first['href']
@@ -197,6 +212,9 @@ def declareitem(item, cmdtlm, parentname, parentinfo, outfile, path, cfepath)
       for childitem in typepage.css('td.memItemLeft') #For each sub-item
 	if childitem.text.include? "CFE_SB_Qos_t"
 	  type = 16
+	  total += type
+	elsif childitem.text.include? "char"
+	  type = 8
 	  total += type
 	else
           type = getitemtype(childitem.text.gsub(/\u00a0/, ' ').strip)[0].split(" ")[0]
@@ -233,7 +251,15 @@ def declareitem(item, cmdtlm, parentname, parentinfo, outfile, path, cfepath)
       thing = "PARAMETER"
     end
 
-    itemdec = "  APPEND_ARRAY_" + thing + " " + itemname + " " + itemtype + " " + size.to_s + " \"" + iteminfo + "\""
+    if itemtype == "STRING"
+      if cmdtlm == 0
+        itemdec = "  APPEND_" + thing + " " + itemname + " " + size.to_s + " " + itemtype +  " \"" + iteminfo + "\""
+      else
+        itemdec = "  APPEND_" + thing + " " + itemname + " " + size.to_s + " " + itemtype +  " \"default\" \"" + iteminfo + "\""
+      end
+    else
+      itemdec = "  APPEND_ARRAY_" + thing + " " + itemname + " " + itemtype + " " + size.to_s + " \"" + iteminfo + "\""
+    end
     outfile.write(itemdec)
     outfile.write("\n")
   elsif itemname == "DWELLADDRESS"
@@ -377,10 +403,11 @@ end
 
 
 
+#This method generates a file containing all message IDs (cmd/tlm) and command IDs
 def getmsgids()
-  outfile = open("msgids.txt", "w")
+  outfile = open("ids/msgids.txt", "w")
 
-  tlmlines = IO.readlines("tlmids.txt")
+  tlmlines = IO.readlines("ids/tlmids.txt")
   for line in tlmlines
     outfile.write(line)
   end
@@ -461,6 +488,7 @@ end
 
 
 
+
 #Main
 
 #Basic path info.
@@ -469,17 +497,17 @@ cfepath = "/home/" + user +"/cfs/cfe/docs/cFEUsersGuide/Doxygen/"
 appspath = "/home/" + user + "/cfs/apps/"
 cfeapps = ["es", "evs", "sb", "tbl", "time"]
 apps = ["cf", "cs", "ds", "fm", "hk", "hs", "lc", "md", "mm", "sc", "sch"]
-puts "Mktlm assumes CFS root is /home/YOUR_USERNAME/cfs" 
+puts "MCT assumes CFS root is /home/YOUR_USERNAME/cfs" 
 puts "You can alter the path manually in the code if you need to"
 
 #Remove old .cmd and .tlm files
-`rm cmd/*.cmd tlm/*.tlm`
+`rm cmd/* tlm/* old/*`
 
 #Create message ID database
 getmsgids()
 
 #Get message ID database
-msgids = IO.readlines("msgids.txt")
+msgids = IO.readlines("ids/msgids.txt")
 
 #Process cFE documentation (core apps).
 path = cfepath
@@ -502,11 +530,12 @@ for app in apps
   end
 end
 
-#Combine all packets into one file for COSMOS to read.
+#Combine all packets into two files for COSMOS to read.
 `cat tlm/*.tlm > cfs_tlm.txt`
 `cat cmd/*.cmd > cfs_cmd.txt`
 
-#Move them to the proper folder, bring old ones here
+#Move them to the proper directories, bring old ones here.
 system("mv /home/" + user + "/COSMOS/cfs/config/targets/CFS/cmd_tlm/cfs_cmd.txt ./old/")
 system("mv /home/" + user + "/COSMOS/cfs/config/targets/CFS/cmd_tlm/cfs_tlm.txt ./old/")
+system("cp cfs_* new/")
 system("mv cfs_* /home/" + user + "/COSMOS/cfs/config/targets/CFS/cmd_tlm/")

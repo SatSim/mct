@@ -1,8 +1,9 @@
 TELEMETRY CFS CFE_SB_HKMSG BIG_ENDIAN "Software Bus task housekeeping Packet"
-  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0803 "CCSDS Packet Identification"
-  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
-  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
-  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0803 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SECONDS 32 UINT "CCSDS Telemetry Secondary Header (seconds)"
+  APPEND_ITEM CCSDS_SUBSECS 16 UINT "CCSDS Telemetry Secondary Header (subseconds)"
   APPEND_ITEM COMMANDCNT 8 UINT "Count of valid commands received."
   APPEND_ITEM CMDERRCNT 8 UINT "Count of invalid commands received."
   APPEND_ITEM NOSUBSCRIBERSCNT 8 UINT "Count pkts sent with no subscribers."

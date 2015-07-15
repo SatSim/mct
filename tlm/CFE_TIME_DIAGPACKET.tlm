@@ -1,8 +1,9 @@
 TELEMETRY CFS CFE_TIME_DIAGPACKET BIG_ENDIAN "Time Services Diagnostics Packet"
-  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0806 "CCSDS Packet Identification"
-  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
-  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
-  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0806 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SECONDS 32 UINT "CCSDS Telemetry Secondary Header (seconds)"
+  APPEND_ITEM CCSDS_SUBSECS 16 UINT "CCSDS Telemetry Secondary Header (subseconds)"
   APPEND_ITEM ATTONEMET_SECONDS 32 UINT "Number of seconds since epoch. (Parent: MET at time of tone.)"
   APPEND_ITEM ATTONEMET_SUBSECONDS 32 UINT "Number of subseconds since epoch (LSB = 2^(-32) seconds). (Parent: MET at time of tone.)"
   APPEND_ITEM ATTONESTCF_SECONDS 32 UINT "Number of seconds since epoch. (Parent: STCF at time of tone.)"

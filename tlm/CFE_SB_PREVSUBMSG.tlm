@@ -1,8 +1,9 @@
 TELEMETRY CFS CFE_SB_PREVSUBMSG BIG_ENDIAN "SB Previous Subscriptions Packet"
-  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x080D "CCSDS Packet Identification"
-  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
-  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
-  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x080D "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SECONDS 32 UINT "CCSDS Telemetry Secondary Header (seconds)"
+  APPEND_ITEM CCSDS_SUBSECS 16 UINT "CCSDS Telemetry Secondary Header (subseconds)"
   APPEND_ITEM PKTSEGMENT 32 UINT "Pkt number(starts at 1) in the series."
   APPEND_ITEM TOTALSEGMENTS 32 UINT "Total number of pkts needed to complete the request."
   APPEND_ITEM ENTRIES 32 UINT "Number of entries in the pkt."

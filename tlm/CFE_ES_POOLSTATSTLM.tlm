@@ -1,8 +1,9 @@
 TELEMETRY CFS CFE_ES_POOLSTATSTLM BIG_ENDIAN "Memory Pool Statistics Packet"
-  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0810 "CCSDS Packet Identification"
-  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control"
-  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length"
-  APPEND_ITEM CCSDS_TIME 48 UINT "CCSDS Telemetry Secondary Header"
+  APPEND_ID_ITEM CCSDS_STREAMID 16 UINT 0x0810 "CCSDS Packet Identification" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SEQUENCE 16 UINT "CCSDS Packet Sequence Control" BIG_ENDIAN
+  APPEND_ITEM CCSDS_LENGTH 16 UINT "CCSDS Packet Data Length" BIG_ENDIAN
+  APPEND_ITEM CCSDS_SECONDS 32 UINT "CCSDS Telemetry Secondary Header (seconds)"
+  APPEND_ITEM CCSDS_SUBSECS 16 UINT "CCSDS Telemetry Secondary Header (subseconds)"
   APPEND_ITEM POOLHANDLE 32 UINT "Handle of memory pool whose stats are being telemetered."
   APPEND_ITEM POOLSTATS_POOLSIZE 32 UINT "Size of Memory Pool (in bytes). (Parent: For more info, see CFE_ES_MemPoolStats_t.)"
   APPEND_ITEM POOLSTATS_NUMBLOCKSREQUESTED 32 UINT "Number of times a memory block has been allocated. (Parent: For more info, see CFE_ES_MemPoolStats_t.)"
